@@ -5,6 +5,7 @@ import re
 import time
 import socket
 from datetime import datetime
+from django.utils.deprecation import MiddlewareMixin
 
 from django_slow_log.exceptions import SlowLogConfigurationError
 
@@ -125,11 +126,12 @@ class MemoryStatus(object):
         return to_bytes(vsize_in_kb)
 
 
-class SlowLogMiddleware(object):
+class SlowLogMiddleware(MiddlewareMixin):
 
     disabled = False
 
-    def __init__(self):
+    def __init__(self, get_response):
+        super(SlowLogMiddleware, self).__init__(get_response)
         if not getattr(self, 'pid', None):
             self.pid = os.getpid()
             self.pidstr = str(self.pid)
